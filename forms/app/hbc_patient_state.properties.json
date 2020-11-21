@@ -1,0 +1,13 @@
+{
+    "icon": "icon-healthcare",
+    "title": [
+      {
+        "locale": "en",
+        "content": "Patient Home Based Care State"
+      }
+    ],
+    "context": {
+        "person": true,
+        "place": false
+    }
+}
