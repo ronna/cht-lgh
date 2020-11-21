@@ -1,0 +1,18 @@
+{
+  "title": [
+    {
+      "locale": "en",
+      "content": "Isolation Request"
+    },
+    {
+      "locale": "fr",
+      "content": "Isolation Request"
+    }
+  ],
+  "context": {
+    "place": false,
+    "person": true,
+    "expression": "user.role === 'chw_supervisor' && contact.role  === 'covid_patient'"
+  },
+  "icon": "icon-healthcare"
+}
