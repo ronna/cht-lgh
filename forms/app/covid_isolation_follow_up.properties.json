@@ -1,0 +1,14 @@
+{
+  "title": [
+    {
+      "locale": "en",
+      "content": "Isolation Follow-Up"
+    }
+  ],
+  "context": {
+      "place": false,
+      "person": true,
+      "expression": "contact.role === 'covid_patient' && user.role === 'chw_supervisor'"
+  },
+  "icon": "icon-healthcare"
+}
