@@ -1,0 +1,16 @@
+{
+    "icon": "icon-mother-child",
+    "title": [
+      {
+        "locale": "en",
+        "content": "Covid Symptoms Follow Up"
+      }
+    ],
+    "context": {
+        "person": true,
+        "place": false
+    },
+    "hidden_fields": [
+        "patient_details"
+    ]
+}
