@@ -216,4 +216,36 @@ module.exports = [
       label: 'task.symptomatic_contact_follow_up.title',
     }],
   }
+
+  // 4. SCovid-19 Patient daily symptoms follow up
+  {
+    name: 'daily_symptoms_follow_up',
+    icon: 'icon-healthcare',
+    title: 'task.daily_symptoms_follow_up.title',
+    appliesTo: 'contacts',
+    appliesToType: undefined,
+    appliesIf: function (contact) {
+      this.mostRecentSymptomsCheck = Utils.getMostRecentReport(contact.reports, 'daily_symptoms_check');
+      return !!this.mostRecentSymptomsCheck && Utils.getField(this.mostRecentSymptomsCheck, 'symptom_check.symptom') === 'yes' && user.role === 'chw_supervisor';
+    },
+    resolvedIf: function (c, r, event) {
+      const startTime = Utils.addDate(event.dueDate(c, r), -event.start);
+      const endTime = Utils.addDate(event.dueDate(c, r), event.end + 1);
+
+      const reportsAfterIsolationFollowUp = c.reports.filter(report => report.reported_date >= this.mostRecentSymptomsCheck.reported_date);
+      return Utils.isFormSubmittedInWindow(reportsAfterIsolationFollowUp, 'isolated_contact_follow_up', startTime, endTime);
+    },
+    events: [{
+      start: 1,
+      end: 3,
+      dueDate: function() {
+        return Utils.addDate(new Date(this.mostRecentSymptomsCheck.reported_date), 1);
+      },
+    }],
+    actions: [{
+      type: 'report',
+      form: 'isolated_contact_follow_up',
+      label: 'task.isolated_contact_follow_up.title',
+    }],
+  }
 ];
