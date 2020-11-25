@@ -248,4 +248,3 @@ module.exports = [
       label: 'task.isolated_contact_follow_up.title',
     }],
   }
-];
