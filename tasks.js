@@ -247,4 +247,5 @@ module.exports = [
       form: 'isolated_contact_follow_up',
       label: 'task.isolated_contact_follow_up.title',
     }],
-  }
+  },
+  ];
