@@ -225,21 +225,21 @@ module.exports = [
     appliesTo: 'contacts',
     appliesToType: undefined,
     appliesIf: function (contact) {
-      this.mostRecentSymptomsCheck = Utils.getMostRecentReport(contact.reports, 'daily_symptoms_check');
-      return !!this.mostRecentSymptomsCheck && Utils.getField(this.mostRecentSymptomsCheck, 'symptom_check.symptom') === 'yes' && user.role === 'chw_supervisor';
+      this.mostRecentSwabResult = Utils.getMostRecentReport(contact.reports, 'covid_swab_result');
+      return !!this.mostRecentSwabResult && Utils.getField(this.mostRecentSwabResult, 'covid_swab_result.result') === 'positive' && user.role === 'chw_supervisor';
     },
     resolvedIf: function (c, r, event) {
       const startTime = Utils.addDate(event.dueDate(c, r), -event.start);
       const endTime = Utils.addDate(event.dueDate(c, r), event.end + 1);
 
-      const reportsAfterIsolationFollowUp = c.reports.filter(report => report.reported_date >= this.mostRecentSymptomsCheck.reported_date);
+      const reportsAfterIsolationFollowUp = c.reports.filter(report => report.reported_date >= this.mostRecentSwabResult.reported_date);
       return Utils.isFormSubmittedInWindow(reportsAfterIsolationFollowUp, 'isolated_contact_follow_up', startTime, endTime);
     },
     events: [{
       start: 1,
       end: 3,
       dueDate: function() {
-        return Utils.addDate(new Date(this.mostRecentSymptomsCheck.reported_date), 1);
+        return Utils.addDate(new Date(this.mostRecentSwabResult.reported_date), 1);
       },
     }],
     actions: [{
