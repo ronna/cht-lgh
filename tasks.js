@@ -215,7 +215,7 @@ module.exports = [
       form: 'symptomatic_contact_follow_up',
       label: 'task.symptomatic_contact_follow_up.title',
     }],
-  }
+  },
 
   // 4. SCovid-19 Patient daily symptoms follow up
   {
