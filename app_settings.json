@@ -746,6 +746,30 @@
       ]
     },
     {
+      "form": "covid_swab_result",
+      "events": [
+        {
+          "name": "on_create",
+          "trigger": "assign_schedule",
+          "params": "daily_symptoms_check_reminder_CHW",
+          "bool_expr": ""
+        }
+      ],
+      "validations": {},
+      "messages": [
+        {
+          "translation_key": "messages.schedule.daily_checkup.reminders",
+          "event_type": "report_accepted",
+          "recipient": "reporting_unit"
+        },
+        {
+          "translation_key": "messages.covid.signal.notification",
+          "event_type": "report_accepted",
+          "recipient": "parent"
+        }
+      ]
+    },
+    {
       "form": "cha_signal_reporting",
       "events": [
         {
@@ -876,6 +900,42 @@
     }
   ],
   "schedules": [
+    {
+      "name": "daily_symptoms_check_reminder_CHW",
+      "summary": "",
+      "description": "",
+      "start_from": "reported_date",
+      "messages": [
+        {
+          "translation_key": "messages.schedule.daily_checkup.reminders",
+          "group": 1,
+          "offset": "24 hours",
+          "send_time": "08:00",
+          "recipient": "parent"
+        },
+        {
+          "translation_key": "messages.schedule.daily_checkup.reminders",
+          "group": 1,
+          "offset": "24 hours",
+          "send_time": "08:00",
+          "recipient": "parent"
+        },
+        {
+          "translation_key": "messages.schedule.daily_checkup.reminders",
+          "group": 1,
+          "offset": "24 hours",
+          "send_time": "08:00",
+          "recipient": "parent"
+        },
+        {
+          "translation_key": "messages.schedule.daily_checkup.reminders",
+          "group": 1,
+          "offset": "24 hours",
+          "send_time": "08:00",
+          "recipient": "parent"
+        }
+      ]
+    },
     {
       "name": "signal_reminders_to_CHA",
       "summary": "",
