@@ -1,1 +1,1 @@
-# cht-lgh
+Configuration of the Luisa Gudotti Hospital Community Health Toolkit. The CHT app will assist with COVID-19 disease surveillance in the community, contact tracing and monitoring of patients in isolation at home.
