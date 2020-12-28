@@ -1,0 +1,13 @@
+{
+  "title": [
+    {
+      "locale": "en",
+      "content": "COVID-19 Symptoms"
+    }
+  "context": {
+    "place": false,
+    "person": true,
+    "expression": "user.role === 'chw_supervisor' && contact.role  === 'covid_patient'"
+  },
+  "icon": "icon-healthcare"
+}
