@@ -25,7 +25,7 @@ const context = {
   hasDeclarationForm: hasReport('declaration'),
   hasLocatorForm: hasReport('locator'),
   hasQuarantineForm: hasReport('quarantine'),
-  isPatient: isPatient with COVID-19(),
+  isPatient: iscovid_patient(),
 };
 
 const fields = [
