@@ -217,7 +217,7 @@ module.exports = [
     }],
   },
 
-  // 4. SCovid-19 Patient daily symptoms follow up
+  // 4. Covid-19 Patient daily symptoms follow up
   {
     name: 'daily_symptoms_follow_up',
     icon: 'icon-healthcare',
