@@ -10,7 +10,8 @@ const getField = (report, fieldPath) => [...(fieldPath || '').split('.')]
     }, report);
 
 const isTraveler = () => { return getField(thisContact, 'role') === 'traveler';};
-const isPatient = () => { return getField(thisContact, 'role') === 'covid_patient'; };
+const isConfirmed = () => { return getField(thisContact, 'role') === 'covid_patient'; };
+const isSuspect = () => { return getField(thisContact, 'role') === 'patient'; };
 
 const isReportValid = function (report) {
   if (report.form && report.fields && report.reported_date) { return true; }
@@ -26,7 +27,9 @@ const context = {
   hasDeclarationForm: hasReport('declaration'),
   hasLocatorForm: hasReport('locator'),
   hasQuarantineForm: hasReport('quarantine'),
-  isPositive: isPatient(),
+  hasIsolationForm: hasReport('covid_symptoms_screening'),
+  isPositive: isConfirmed(),
+  isUnconfirmed: isSuspect(),
 };
 
 const fields = [
@@ -106,10 +109,10 @@ const cards = [
   {
     label: 'contact.profile.symptoms.form',
     appliesToType: 'person',
-    appliesIf: isPatient,
+    appliesIf: isConfirmed,
     fields: function () {
       const fields = [];
-      const report = getNewestReport(allReports, 'covid_symptoms');
+      const report = getNewestReport(allReports, 'covid_symptoms_screening');
       if (report) {
         fields.push(
             { label: 'contact.profile.symptoms.breathing', value: getField(report, 'fields.covid_symptoms.breathing'), width: 4 },
@@ -135,7 +138,7 @@ const cards = [
   {
     label: 'contact.profile.comorbidities.form',
     appliesToType: 'person',
-    appliesIf: isPatient,
+    appliesIf: isConfirmed,
     fields: function () {
       const fields = [];
       const report = getNewestReport(allReports, 'covid_comorbidities');
@@ -160,6 +163,26 @@ const cards = [
     }
   },
 
+  {
+    label: 'contact.profile.isolation.form',
+    appliesToType: 'person',
+    appliesIf: isConfirmed,
+    fields: function () {
+      const fields = [];
+      const report = getNewestReport(allReports, 'covid_symptoms_screening');
+      if (report) {
+        fields.push(
+            { label: 'contact.profile.isolation.area', value: getField(report, 'fields.home_isolations.isolation_area'), width: 4 },
+            { label: 'contact.profile.isolation.date', value: getField(report, 'fields.home_isolation.date_isolation'), filter: 'simpleDate', width: 4 },
+        );
+      }
+      else {
+        fields.push({ label: 'contact.profile.isolation.form.none' });
+      }
+
+      return fields;
+    }
+  },
   {
     label: 'contact.profile.declaration.form',
     appliesToType: 'person',
