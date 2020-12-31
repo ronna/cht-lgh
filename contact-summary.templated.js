@@ -9,7 +9,8 @@ const getField = (report, fieldPath) => [...(fieldPath || '').split('.')]
       return prev[fieldName];
     }, report);
 
-const isTraveler = () => { return getField(thisContact, 'role') === 'traveler'; };
+const isTraveler = () => { return getField(thisContact, 'role') === 'traveler';
+const isPatient = () => { return getField(thisContact, 'role') === 'covid_patient'; };
 
 const isReportValid = function (report) {
   if (report.form && report.fields && report.reported_date) { return true; }
@@ -25,7 +26,7 @@ const context = {
   hasDeclarationForm: hasReport('declaration'),
   hasLocatorForm: hasReport('locator'),
   hasQuarantineForm: hasReport('quarantine'),
-  isPatient: iscovid_patient(),
+  isPositive: isPatient(),
 };
 
 const fields = [
