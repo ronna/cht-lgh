@@ -9,7 +9,7 @@ const getField = (report, fieldPath) => [...(fieldPath || '').split('.')]
       return prev[fieldName];
     }, report);
 
-const isTraveler = () => { return getField(thisContact, 'role') === 'traveler';
+const isTraveler = () => { return getField(thisContact, 'role') === 'traveler';};
 const isPatient = () => { return getField(thisContact, 'role') === 'covid_patient'; };
 
 const isReportValid = function (report) {
@@ -102,7 +102,6 @@ const cards = [
       return fields;
     }
   },
-
 
   {
     label: 'contact.profile.symptoms.form',
