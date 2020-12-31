@@ -2,8 +2,13 @@
   "title": [
     {
       "locale": "en",
-      "content": "COVID-19 Symptoms"
+      "content": "COVID Symptoms"
+    },
+    {
+      "locale": "fr",
+      "content": "COVID Symptoms"
     }
+  ],
   "context": {
     "place": false,
     "person": true,
