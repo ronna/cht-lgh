@@ -133,6 +133,34 @@ const cards = [
   },
 
   {
+    label: 'contact.profile.comorbidities.form',
+    appliesToType: 'person',
+    appliesIf: isPatient,
+    fields: function () {
+      const fields = [];
+      const report = getNewestReport(allReports, 'covid_comorbidities');
+      if (report) {
+        fields.push(
+            { label: 'contact.profile.comorbiditiess.bp', value: getField(report, 'fields.danger_signs.bp'), width: 4 },
+            { label: 'contact.profile.comorbidities.diabetes', value: getField(report, 'fields.danger_signs.diabetes'), width: 4 },
+            { label: 'contact.profile.comorbidities.cardiac', value: getField(report, 'fields.danger_signs.cardiac'), width: 4 },
+            { label: 'contact.profile.comorbidities.hiv', value: getField(report, 'fields.danger_signs.hiv'), width: 4 },
+            { label: 'contact.profile.comorbidities.copd', value: getField(report, 'fields.danger_signs.copd'), width: 4 },
+            { label: 'contact.profile.comorbidities.ckd', value: getField(report, 'fields.danger_signs.ckd'), width: 4 },
+            { label: 'contact.profile.comorbidities.tumor', value: getField(report, 'fields.danger_signs.tumor'), width: 4 },
+            { label: 'contact.profile.comorbidities.metabolic', value: getField(report, 'fields.danger_signs.metabolic'), width: 4 },
+            { label: 'contact.profile.comorbidities.miscarriage', value: getField(report, 'fields.danger_signs.miscarriage'), width: 4 }
+        );
+      }
+      else {
+        fields.push({ label: 'contact.profile.comorbidities.form.none' });
+      }
+
+      return fields;
+    }
+  },
+
+  {
     label: 'contact.profile.declaration.form',
     appliesToType: 'person',
     appliesIf: isTraveler,
