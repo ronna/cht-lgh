@@ -25,6 +25,7 @@ const context = {
   hasDeclarationForm: hasReport('declaration'),
   hasLocatorForm: hasReport('locator'),
   hasQuarantineForm: hasReport('quarantine'),
+  isPatient: isPatient with COVID-19(),
 };
 
 const fields = [
@@ -95,6 +96,36 @@ const cards = [
       }
       else {
         fields.push({ label: 'contact.profile.quarantine.form.none' });
+      }
+
+      return fields;
+    }
+  },
+
+
+  {
+    label: 'contact.profile.symptoms.form',
+    appliesToType: 'person',
+    appliesIf: isPatient,
+    fields: function () {
+      const fields = [];
+      const report = getNewestReport(allReports, 'covid_symptoms');
+      if (report) {
+        fields.push(
+            { label: 'contact.profile.symptoms.breathing', value: getField(report, 'fields.covid_symptoms.breathing'), width: 4 },
+            { label: 'contact.profile.symptoms.chest_pain', value: getField(report, 'fields.covid_symptoms.chest_pain'), width: 4 },
+            { label: 'contact.profile.symptoms.onset_date', value: getField(report, 'fields.symptoms_onset.date_symptoms_onset'), filter: 'simpleDate', width: 4 },
+            { label: 'contact.profile.symptoms.confusion', value: getField(report, 'fields.covid_symptoms.confusion'), width: 4 },
+            { label: 'contact.profile.symptoms.fever', value: getField(report, 'fields.covid_symptoms.fever'), width: 4 },
+            { label: 'contact.profile.symptoms.dry_cough', value: getField(report, 'fields.covid_symptoms.dry_cough'), width: 4 },
+            { label: 'contact.profile.symptoms.fatigue', value: getField(report, 'fields.covid_symptoms.fatigue'), width: 4 },
+            { label: 'contact.profile.symptoms.muscle_ache', value: getField(report, 'fields.covid_symptoms.muscle_aches'), width: 4 },
+            { label: 'contact.profile.symptoms.nasal', value: getField(report, 'fields.covid_symptoms.nasal'), width: 4 },
+            { label: 'contact.profile.symptoms.nausea', value: getField(report, 'fields.covid_symptoms.nausea'), width: 4 }
+        );
+      }
+      else {
+        fields.push({ label: 'contact.profile.symptoms.form.none' });
       }
 
       return fields;
