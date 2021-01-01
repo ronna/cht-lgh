@@ -115,9 +115,10 @@ const cards = [
       const report = getNewestReport(allReports, 'covid_symptoms_screening');
       if (report) {
         fields.push(
+            { label: 'contact.profile.symptoms.onset_date', value: getField(report, 'fields.symptoms_onset.date_symptoms_onset'), filter: 'simpleDate', width: 4 },
+            { label: 'contact.profile.symptoms.days_since_onset_date', value: getField(report, 'fields.symptoms_onset.days_since_symptoms_onset'), filter: 'simpleDate', width: 4 },
             { label: 'contact.profile.symptoms.breathing', value: getField(report, 'fields.covid_symptoms.breathing'), width: 4 },
             { label: 'contact.profile.symptoms.chest_pain', value: getField(report, 'fields.covid_symptoms.chest_pain'), width: 4 },
-            { label: 'contact.profile.symptoms.onset_date', value: getField(report, 'fields.symptoms_onset.date_symptoms_onset'), filter: 'simpleDate', width: 4 },
             { label: 'contact.profile.symptoms.confusion', value: getField(report, 'fields.covid_symptoms.confusion'), width: 4 },
             { label: 'contact.profile.symptoms.fever', value: getField(report, 'fields.covid_symptoms.fever'), width: 4 },
             { label: 'contact.profile.symptoms.dry_cough', value: getField(report, 'fields.covid_symptoms.dry_cough'), width: 4 },
@@ -173,7 +174,9 @@ const cards = [
       if (report) {
         fields.push(
             { label: 'contact.profile.isolation.area', value: getField(report, 'fields.home_isolations.isolation_area'), width: 4 },
-            { label: 'contact.profile.isolation.date', value: getField(report, 'fields.home_isolation.date_isolation'), filter: 'simpleDate', width: 4 }
+            { label: 'contact.profile.isolation.date', value: getField(report, 'fields.home_isolation.date_isolation'), filter: 'simpleDate', width: 4 },
+            { label: 'contact.profile.isolation.days_since_isolation', value: getField(report, 'fields.home_isolation.days_since_isolation'), width: 4 },
+            { label: 'contact.profile.isolation.expected_discharge_date', value: getField(report, 'fields.home_isolation.expected_discharge_date'), filter: 'simpleDate', width: 4 },
         );
       }
       else {
