@@ -176,7 +176,7 @@ const cards = [
             { label: 'contact.profile.isolation.area', value: getField(report, 'fields.home_isolations.isolation_area'), width: 4 },
             { label: 'contact.profile.isolation.date', value: getField(report, 'fields.home_isolation.date_isolation'), filter: 'simpleDate', width: 4 },
             { label: 'contact.profile.isolation.days_since_isolation', value: getField(report, 'fields.home_isolation.days_since_isolation'), width: 4 },
-            { label: 'contact.profile.isolation.expected_discharge_date', value: getField(report, 'fields.home_isolation.expected_discharge_date'), filter: 'simpleDate', width: 4 },
+            { label: 'contact.profile.isolation.expected_discharge_date', value: getField(report, 'fields.home_isolation.expected_discharge_date'), filter: 'simpleDate', width: 4 }
         );
       }
       else {
