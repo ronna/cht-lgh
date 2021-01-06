@@ -8,7 +8,7 @@
   "context": {
     "place": false,
     "person": true,
-    "expression": "user.role === 'chw_supervisor' && contact.role  === 'covid_patient'"
+    "expression": "contact.type === 'person' && user.role === 'chw_supervisor' && contact.role  === 'covid_patient'"
   },
   "icon": "icon-healthcare"
 }
