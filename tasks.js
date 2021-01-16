@@ -1,9 +1,9 @@
 // used with the additional task for Home Based Care/Home Isolation. Based on Config-MSF code
 const descriptiveContactLabel = (contact, report) => {
-const firstname = getFields(report,'g_alterations.alt_firstname_of_patient','g_details.firstname_of_patient','inputs.g_details.firstname_of_patient');
-const lastname = getFields(report, 'g_alterations.alt_lastname_of_patient','g_details.lastname_of_patient','inputs.g_details.lastname_of_patient');
-const district = getFields(report, 'g_alterations.alt_district','g_details.district','inputs.g_details.district');
-const phone = getFields(report, 'g_alterations.alt_number_of_patient_1','g_details.number_of_patient_1','inputs.g_details.number_of_patient_1');
+const firstname = getFields(report,'contact.name');
+const lastname = getFields(report, 'contact.surname');
+const district = getFields(report, 'contact.town');
+const phone = getFields(report, 'contact.phone');
 
 const fullname = (lastname && firstname) ? lastname + ' ' + firstname : (lastname || firstname) ;
 
@@ -12,25 +12,11 @@ const label = (fullname && district) ? fullname + ' - ' + district : (fullname |
 return label;
 };
 
+// re look at the code block - might not be necessary
 const completeEditableContent = (content, contact, report) => {
-  content.g_details = {};
-  content.g_symptoms = {};
-  content.g_details.case_number = getFields(report, 'g_alterations.alt_case_number', 'g_details.case_number');
-  content.g_details.lastname_of_patient =  getFields(report,'g_alterations.alt_lastname_of_patient','g_details.lastname_of_patient');
-  content.g_details.firstname_of_patient =  getFields(report,'g_alterations.alt_firstname_of_patient', 'g_details.firstname_of_patient');
-  content.g_details.age =  getFields(report, 'g_alterations.alt_age', 'g_details.age');
-  content.g_details.months_or_years =  getFields(report, 'g_alterations.alt_months_or_years', 'g_details.months_or_years');
-  content.g_details.sex_of_patient =  getFields(report,'g_alterations.alt_sex_of_patient', 'g_details.sex_of_patient');
-  content.g_details.number_of_patient_1 = getFields( report,'g_alterations.alt_number_of_patient_1' ,'g_details.number_of_patient_1');
-  content.g_details.number_of_patient_2 = getFields(report, 'g_alterations.alt_number_of_patient_2',  'g_details.number_of_patient_2');
-  content.g_details.patient_current_location =  getFields(report,'g_alterations.alt_patient_current_location' , 'g_details.patient_current_location');
-  content.g_details.region = getFields( report,'g_alterations.alt_region' ,'g_details.region');
-  content.g_details.district = getFields(report, 'g_alterations.alt_district' , 'g_details.district');
-  content.g_details.commune = getFields(report, 'g_alterations.alt_commune' , 'g_details.commune');
-  content.g_details.quartier =  getFields(report,'g_alterations.alt_quartier', 'g_details.quartier');
-  content.g_symptoms.symptoms =  getFields(report,'g_alterations.alt_symptoms', 'g_symptoms.symptoms');
-  content.g_symptoms.other_symptoms =  getFields(report, 'g_alterations.alt_other_symptoms', 'g_symptoms.other_symptoms');
-  content.g_symptoms.call_outcome =  getFields(report ,'g_alterations.alt_call_outcome', 'g_symptoms.call_outcome');
+  content.covid_symptoms = {};
+  content.covid_symptoms =  getFields(report,'covid_symptoms.symptoms');
+  content.covid_symptoms.call_outcome =  getFields(report ,'covid_symptoms.call_outcome');
   return content;
 };
 
@@ -48,10 +34,10 @@ const lghFollowupTemplate = (name, source, userType, colour, criteria) => ({
   appliesTo: 'reports',
   appliesToType: [source],
   appliesIf: (contact, report) => {
-    const symptoms = getFields(report,'g_alterations.alt_symptoms', 'g_symptoms.symptoms') || '';
+    const symptoms = getFields(report,'covid_symptoms.symptoms') || '';
     const symptomCount = symptoms.split(' ').length;
-    const alreadyAssigned = Utils.getField(report,'g_action.action') === 'assign'; // for older reports
-    return criteria(symptomCount) && userHasParent(userType) && !alreadyAssigned;
+    //const alreadyAssigned = Utils.getField(report,'g_action.action') === 'assign'; // for older reports
+    return criteria(symptomCount) && userHasParent(userType); // && !alreadyAssigned;
   },
   resolvedIf: (contact, report, event, dueDate) => {
     const relevantReports = contact.reports.filter(r =>
@@ -81,11 +67,11 @@ const lghFollowupTemplate = (name, source, userType, colour, criteria) => ({
     start: 0,
     end: 1000,
     dueDate: (event, contact, report) => {
-      const symptoms = getFields(report,'g_alterations.alt_symptoms', 'g_symptoms.symptoms') || '';
+      const symptoms = getFields(report,'covid_symptoms.symptoms') || '';
       const symptomCount = Math.min(symptoms.split(' ').length, 3);
 
       // sorting ignores when the report was made
-      return Utils.addDate(new Date('2020-04-01'), -symptomCount);
+      return Utils.addDate(new Date('2021-01-16'), -symptomCount);
     },
   }],
 });
@@ -94,44 +80,38 @@ const userHasParent = userType => user && user.parent && user.parent.contact_typ
 
 module.exports = [
   lghFollowupTemplate(
-    'riposte_followup',
-    'samu',
-    'riposte',
+    'covid_symptoms_followup',
+    'covid_symptoms_screening',
     'black',
     symptomCount => symptomCount <= 1,
   ),
   lghFollowupTemplate(
-    'riposte_followup',
-    'samu',
-    'riposte',
+    'covid_symptoms_followup',
+    'covid_symptoms_screening',
     'ambre',
     symptomCount => symptomCount === 2,
   ),
   lghFollowupTemplate(
-    'riposte_followup',
-    'samu',
-    'riposte',
+    'covid_symptoms_followup',
+    'covid_symptoms_screening',
     'red',
     symptomCount => symptomCount >= 3,
   ),
   lghFollowupTemplate(
-    'rg_riposte_followup',
-    'riposte_followup',
-    'rg_riposte',
+    'covid_symptoms_followup',
+    'covid_symptoms_screening',
     'black',
     symptomCount => symptomCount <= 1,
   ),
   lghFollowupTemplate(
-    'rg_riposte_followup',
-    'riposte_followup',
-    'rg_riposte',
+    'covid_symptoms_followup',
+    'covid_symptoms_screening',
     'ambre',
     symptomCount => symptomCount === 2,
   ),
   lghFollowupTemplate(
-    'rg_riposte_followup',
-    'riposte_followup',
-    'rg_riposte',
+    'covid_symptoms_followup',
+    'covid_symptoms_screening',
     'red',
     symptomCount => symptomCount >= 3,
   ),
@@ -376,7 +356,7 @@ module.exports = [
       const endTime = Utils.addDate(event.dueDate(c, r), event.end + 1);
 
       const reportsAfterIsolationFollowUp = c.reports.filter(report => report.reported_date >= this.mostRecentSwabResult.reported_date);
-      return Utils.isFormSubmittedInWindow(reportsAfterIsolationFollowUp, 'isolated_contact_follow_up', startTime, endTime);
+      return Utils.isFormSubmittedInWindow(reportsAfterIsolationFollowUp, 'covid_symptoms_followup', startTime, endTime);
     },
     events: [{
       start: 1,
@@ -387,7 +367,7 @@ module.exports = [
     }],
     actions: [{
       type: 'report',
-      form: 'isolated_contact_follow_up',
+      form: 'covid_symptoms_followup',
       label: 'task.isolated_contact_follow_up.title',
     }],
   }
@@ -431,7 +411,7 @@ module.exports = [
     icon: 'icon_issue',
     title: 'task.outcome-follow-up.title',
     appliesTo: 'reports',
-    appliesToType: ['sampling_follow_up'],
+    appliesToType: ['covid_symptoms_followup'],
     contactLabel: descriptiveContactLabel,
     appliesIf: (contact, report) => {
       return Utils.getField(report, 'g_results.results') === 'positive' && userHasParent('investigator');
@@ -440,7 +420,7 @@ module.exports = [
       const relevantReports = contact.reports.filter(r => Utils.getField(r, 'inputs.source_id') === report._id);
       return Utils.isFormSubmittedInWindow(
         relevantReports,
-        'outcome',
+        'exit',
         Utils.addDate(dueDate, -event.start).getTime(),
         Utils.addDate(dueDate, event.end + 1).getTime()
       );
