@@ -1,5 +1,140 @@
+// used with the additional task for Home Based Care/Home Isolation. Based on Config-MSF code
+const descriptiveContactLabel = (contact, report) => {
+const firstname = getFields(report,'g_alterations.alt_firstname_of_patient','g_details.firstname_of_patient','inputs.g_details.firstname_of_patient');
+const lastname = getFields(report, 'g_alterations.alt_lastname_of_patient','g_details.lastname_of_patient','inputs.g_details.lastname_of_patient');
+const district = getFields(report, 'g_alterations.alt_district','g_details.district','inputs.g_details.district');
+const phone = getFields(report, 'g_alterations.alt_number_of_patient_1','g_details.number_of_patient_1','inputs.g_details.number_of_patient_1');
+
+const fullname = (lastname && firstname) ? lastname + ' ' + firstname : (lastname || firstname) ;
+
+const label = (fullname && district) ? fullname + ' - ' + district : (fullname || phone) ;
+
+return label;
+};
+
+const completeEditableContent = (content, contact, report) => {
+  content.g_details = {};
+  content.g_symptoms = {};
+  content.g_details.case_number = getFields(report, 'g_alterations.alt_case_number', 'g_details.case_number');
+  content.g_details.lastname_of_patient =  getFields(report,'g_alterations.alt_lastname_of_patient','g_details.lastname_of_patient');
+  content.g_details.firstname_of_patient =  getFields(report,'g_alterations.alt_firstname_of_patient', 'g_details.firstname_of_patient');
+  content.g_details.age =  getFields(report, 'g_alterations.alt_age', 'g_details.age');
+  content.g_details.months_or_years =  getFields(report, 'g_alterations.alt_months_or_years', 'g_details.months_or_years');
+  content.g_details.sex_of_patient =  getFields(report,'g_alterations.alt_sex_of_patient', 'g_details.sex_of_patient');
+  content.g_details.number_of_patient_1 = getFields( report,'g_alterations.alt_number_of_patient_1' ,'g_details.number_of_patient_1');
+  content.g_details.number_of_patient_2 = getFields(report, 'g_alterations.alt_number_of_patient_2',  'g_details.number_of_patient_2');
+  content.g_details.patient_current_location =  getFields(report,'g_alterations.alt_patient_current_location' , 'g_details.patient_current_location');
+  content.g_details.region = getFields( report,'g_alterations.alt_region' ,'g_details.region');
+  content.g_details.district = getFields(report, 'g_alterations.alt_district' , 'g_details.district');
+  content.g_details.commune = getFields(report, 'g_alterations.alt_commune' , 'g_details.commune');
+  content.g_details.quartier =  getFields(report,'g_alterations.alt_quartier', 'g_details.quartier');
+  content.g_symptoms.symptoms =  getFields(report,'g_alterations.alt_symptoms', 'g_symptoms.symptoms');
+  content.g_symptoms.other_symptoms =  getFields(report, 'g_alterations.alt_other_symptoms', 'g_symptoms.other_symptoms');
+  content.g_symptoms.call_outcome =  getFields(report ,'g_alterations.alt_call_outcome', 'g_symptoms.call_outcome');
+  return content;
+};
+
+const getFields = (report, ...fields) => {
+const fieldName = fields.find(field => Utils.getField(report, field));
+if(fieldName === undefined){ return undefined; }
+return Utils.getField(report, fieldName);
+};
+
+const lghFollowupTemplate = (name, source, userType, colour, criteria) => ({
+  name: `${name}_${colour}`,
+  icon: `icon-warning-${colour}`,
+  title: `task.${name}.title`,
+  contactLabel: descriptiveContactLabel,
+  appliesTo: 'reports',
+  appliesToType: [source],
+  appliesIf: (contact, report) => {
+    const symptoms = getFields(report,'g_alterations.alt_symptoms', 'g_symptoms.symptoms') || '';
+    const symptomCount = symptoms.split(' ').length;
+    const alreadyAssigned = Utils.getField(report,'g_action.action') === 'assign'; // for older reports
+    return criteria(symptomCount) && userHasParent(userType) && !alreadyAssigned;
+  },
+  resolvedIf: (contact, report, event, dueDate) => {
+    const relevantReports = contact.reports.filter(r =>
+      Utils.getField(r, 'inputs.source_id') === report._id ||
+      r.source_id === report._id
+    );
+
+    const isFormSubmittedInWindow = formName => Utils.isFormSubmittedInWindow(
+      relevantReports,
+      formName,
+      Utils.addDate(dueDate, -event.start).getTime(),
+      Utils.addDate(dueDate, event.end + 1).getTime()
+    );
+
+    return isFormSubmittedInWindow(name) || isFormSubmittedInWindow(`${name}_stub`);
+  },
+  actions: [{
+    form: name,
+    label: 'Followup',
+    modifyContent: completeEditableContent
+  }],
+  priority: {
+    level: 'high',
+    label: `task.${name}-${colour}.label`
+  },
+  events: [{
+    start: 0,
+    end: 1000,
+    dueDate: (event, contact, report) => {
+      const symptoms = getFields(report,'g_alterations.alt_symptoms', 'g_symptoms.symptoms') || '';
+      const symptomCount = Math.min(symptoms.split(' ').length, 3);
+
+      // sorting ignores when the report was made
+      return Utils.addDate(new Date('2020-04-01'), -symptomCount);
+    },
+  }],
+});
+
+const userHasParent = userType => user && user.parent && user.parent.contact_type === userType;
 
 module.exports = [
+  lghFollowupTemplate(
+    'riposte_followup',
+    'samu',
+    'riposte',
+    'black',
+    symptomCount => symptomCount <= 1,
+  ),
+  lghFollowupTemplate(
+    'riposte_followup',
+    'samu',
+    'riposte',
+    'ambre',
+    symptomCount => symptomCount === 2,
+  ),
+  lghFollowupTemplate(
+    'riposte_followup',
+    'samu',
+    'riposte',
+    'red',
+    symptomCount => symptomCount >= 3,
+  ),
+  lghFollowupTemplate(
+    'rg_riposte_followup',
+    'riposte_followup',
+    'rg_riposte',
+    'black',
+    symptomCount => symptomCount <= 1,
+  ),
+  lghFollowupTemplate(
+    'rg_riposte_followup',
+    'riposte_followup',
+    'rg_riposte',
+    'ambre',
+    symptomCount => symptomCount === 2,
+  ),
+  lghFollowupTemplate(
+    'rg_riposte_followup',
+    'riposte_followup',
+    'rg_riposte',
+    'red',
+    symptomCount => symptomCount >= 3,
+  ),
   /****
    Use case :  RDT screening
    1. Followup after positive RDT
@@ -217,7 +352,15 @@ module.exports = [
     }],
   },
 
-  // 4. Covid-19 Patient daily symptoms follow up
+// Have a look at the below tasks and associated forms and  make sure the code and fields are correct - 16/01/2021
+  /****
+   Use case :  Home Based Care (Home Isolation)
+   1. Followup with a patient after home isolation - daily symptoms check
+   2. Follow up COVID Test result
+   3. Outcome follow up
+   ****/
+
+  // 1. Covid-19 Patient daily symptoms follow up
   {
     name: 'daily_symptoms_follow_up',
     icon: 'icon-healthcare',
@@ -247,5 +390,74 @@ module.exports = [
       form: 'isolated_contact_follow_up',
       label: 'task.isolated_contact_follow_up.title',
     }],
-  },
+  }
+
+  // 2. Sampling followup
+  {
+    name: 'sampling-follow-up',
+    icon: 'icon_sample',
+    title: 'task.sampling-follow-up.title',
+    appliesTo: 'reports',
+    appliesToType: ['investigation'],
+    contactLabel: descriptiveContactLabel,
+    appliesIf: (contact, report) => {
+      return Utils.getField(report, 'investigation.sample_collection') === 'yes' && userHasParent('investigator');
+    },
+    resolvedIf: (contact, report, event, dueDate) => {
+      const relevantReports = contact.reports.filter(r => Utils.getField(r, 'inputs.source_id') === report._id);
+      return Utils.isFormSubmittedInWindow(
+        relevantReports,
+        'sampling_follow_up',
+        Utils.addDate(dueDate, -event.start).getTime(),
+        Utils.addDate(dueDate, event.end + 1).getTime()
+      );
+    },
+    events: [{
+      days: 0,
+      start: 0,
+      end: 25550
+    }],
+    actions: [{
+      type: 'report',
+      form: 'sampling_follow_up',
+      label: 'task.sampling-follow-up.title',
+      modifyContent: completeEditableContent
+    }]
+  }
+
+// 3. Outcome Follow up
+  {
+    name: 'outcome-follow-up',
+    icon: 'icon_issue',
+    title: 'task.outcome-follow-up.title',
+    appliesTo: 'reports',
+    appliesToType: ['sampling_follow_up'],
+    contactLabel: descriptiveContactLabel,
+    appliesIf: (contact, report) => {
+      return Utils.getField(report, 'g_results.results') === 'positive' && userHasParent('investigator');
+    },
+    resolvedIf: (contact, report, event, dueDate) => {
+      const relevantReports = contact.reports.filter(r => Utils.getField(r, 'inputs.source_id') === report._id);
+      return Utils.isFormSubmittedInWindow(
+        relevantReports,
+        'outcome',
+        Utils.addDate(dueDate, -event.start).getTime(),
+        Utils.addDate(dueDate, event.end + 1).getTime()
+      );
+    },
+    events: [{
+      days: 10,
+      start: 0,
+      end: 25550
+    }],
+    actions: [{
+      type: 'report',
+      form: 'outcome',
+      label: 'task.outcome-follow-up.title',
+      modifyContent : (content, contact, report) => {
+        content.g_details = report.fields.inputs.g_details;
+        return content;
+      }
+    }]
+  }
   ];
